@@ -3,7 +3,7 @@
 [P01_generate DirNav page.py]
 Purpose:
     Generate the static DirNav HTML page from projects.json.
-    Reads ../projects.json, validates it, then writes ../07_html/index.html with
+    Reads ../projects.json, validates it, then writes ../02_html/index.html with
     the data embedded as window.DIRNAV_DATA. The page links style.css and
     03_js/app.js as separate files; app.js does the client-side render.
 Author: Meng-Chi Ed Chen
@@ -23,7 +23,7 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 ROOT = HERE.parent
-HTML_DIR = ROOT / "07_html"
+HTML_DIR = ROOT / "02_html"
 INCLUDES_DIR = HTML_DIR / "04_includes"
 JSON_PATH = ROOT / "projects.json"
 OUT_PATH = HTML_DIR / "index.html"
