@@ -7,6 +7,8 @@ One JSON file, one click, every folder and url and file for a project opens at o
 
 ![Kickoff opening folders, urls, and files](DirNav_demo.gif)
 
+Try the [live demo](https://edchen1240.github.io/DirNav/). Browse-only, since Kickoff and Open P00 require the local Windows install.
+
 Windows 10 and 11. MIT licensed.
 
 

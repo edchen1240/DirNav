@@ -1,1 +1,16 @@
+# Local-only launcher (personal git wrapper, not part of the project)
 [G]_12_GitHub_DirNav_git.bat
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Editors
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
