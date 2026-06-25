@@ -13,6 +13,13 @@ Windows 10 and 11. MIT licensed.
 
 # Why this exists
 
+## The Problem
+1. A user usually manage 10~20 active projects on their computer, ranging from work to personal, learning to hobby, and research to side projects. 
+2. Each project has its own folder(s), url(s), and file(s) that the user needs to open to work on it.
+3. Opening all the related folders, urls, and files for a project takes time and attention, and the user might forget some of them, or open the wrong one.
+4. After a long pause on a certain project, the user might forget where are all the related folders are, and might need lose time to search for them, and even create friction to start working on it again.
+
+
 Every project lives in a different corner of your disk. A code folder on one drive, an Overleaf url, a status spreadsheet on OneDrive, a Claude project, three reference folders, a launcher `.bat`. Opening them all takes ten minutes of clicking. Multiply by twenty active projects and the friction becomes its own task.
 
 DirNav collapses two failed habits into one tool:
@@ -26,7 +33,7 @@ Add a project in one place. Open everything for it in one click.
 # How it works
 
 ```
-projects.json  ->  TypeScript generator  ->  static HTML dashboard
+projects.json  ->  Python generator  ->  static HTML dashboard
                                                     |
                                                     | click Kickoff
                                                     v
@@ -48,26 +55,27 @@ The page is the UI. The manifest is the trust boundary. PowerShell does the work
 
 # Features
 
-- Single source of truth: every project, folder, url, file, P00 path, attribute, priority, status, and date lives in `projects.json`. Edit, recompile, done.
+- Single source of truth: every project, folder, url, file, path to project log file (P00, can be md, txt, or excel), attribute, priority, status, and date lives in `projects.json`. Edit, recompile, done.
 - Fuzzy global finder across every folder, url, file, and P00 path in every project.
 - Attribute filter chips with per-tag colors. Add an attribute by editing one line in the manifest.
 - Status pool with dim flags. `paused`, `stalled`, and `completed` projects render dimmed automatically.
 - Grouped grid. Cards group by primary attribute, the highest-priority group on top, ordered by priority within each group. Low-priority and unset cards drop into a parked band at the bottom.
 - One-click batch open. The Kickoff button opens every checked folder as an Explorer tab, then the urls, then the files. Uncheck items to open only a subset.
 - Open P00 button. Opens the project's P00 markdown in VSCode. Ctrl plus click opens its folder in Explorer instead.
-- Validated at compile time. A zod schema cross-checks attribute-pool membership, unique slugs, and related-link symmetry. A broken `projects.json` prints an error instead of writing a broken page.
+- Validated at compile time. The generator checks attribute-pool membership, unique slugs, date formats, and related-link symmetry. A broken `projects.json` prints an error instead of writing a broken page.
 
 
 
 # Quick start
 
-Requirements: Windows 10 or 11, Node.js, PowerShell (built in), VSCode (only if you want the Open P00 button).
+Requirements: Windows 10 or 11, Python 3.x on PATH, PowerShell (built in), VSCode (only if you want the Open P00 button). No pip install needed, the generator uses standard library only.
+
+All internal paths are resolved at install time. The only file you edit by hand is `projects.json` (the project entries themselves).
 
 1. Clone the repo. Copy `projects.example.json` to `projects.json` and edit it to point at your own folders.
-2. Run `[B]_0-Setup.bat` once. Installs `tsx` and `zod` into `01_scripts`.
-3. Run `[B]_1-Install Protocol.bat` once. Registers the `kickoff://` protocol under your Windows user (HKCU). Re-run if you ever move the repo. Fully restart your browser after the first install so it picks up the new scheme.
-4. Run `[B]_2-Compile Dashboard.bat` after every edit to `projects.json`. Validates the manifest, then regenerates `02_html/index.html`.
-5. Run `[B]_localhost homepage.bat` to serve the dashboard at `http://localhost:5599` and open the browser. Keep that window open while using DirNav.
+2. Run `[B]_1-Install Protocol.bat` once. Registers the `kickoff://` protocol under your Windows user (HKCU). Re-run if you ever move the repo. Fully restart your browser after the first install so it picks up the new scheme.
+3. Run `[B]_2-Compile Dashboard.bat` after every edit to `projects.json`. Validates the manifest, then regenerates `02_html/index.html`.
+4. Run `[B]_localhost homepage.bat` (or `python -m http.server 5599` from `02_html/`) to serve the dashboard, then open `http://localhost:5599` in your browser. Keep the server running while using DirNav.
 
 The first Kickoff click prompts you once to allow PowerShell. That is Windows confirming the custom protocol, not the script asking for elevation.
 
@@ -76,10 +84,9 @@ The first Kickoff click prompts you once to allow PowerShell. That is Windows co
 # Repo layout
 
 ```
-01_scripts/             generate.ts, types.ts (zod schema), kickoff.ps1, Install-Protocol.ps1
+01_scripts/             P01_generate DirNav page.py, kickoff.ps1, Install-Protocol.ps1
 02_html/                generated index.html, style.css, 03_js/app.js, 04_includes/
 projects.example.json   sanitized sample manifest
-[B]_0-Setup.bat
 [B]_1-Install Protocol.bat
 [B]_2-Compile Dashboard.bat
 [B]_localhost homepage.bat

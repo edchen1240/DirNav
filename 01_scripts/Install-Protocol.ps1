@@ -1,7 +1,7 @@
 # ============================================================
 # Registers the kickoff:// URI protocol under HKCU. No admin needed.
-# After running, a page link like kickoff://WSe2OEP?items=d0,u0 invokes
-# 10_scripts\kickoff.ps1 with that full URI as %1.
+# After running, a page link like kickoff://MySlug?items=d0,u0 invokes
+# 01_scripts\kickoff.ps1 with that full URI as %1.
 # Run once. Re-run safely if you move the folder.
 # ============================================================
 
@@ -21,4 +21,4 @@ Write-Host "Registered kickoff:// protocol."
 Write-Host "  Handler: $scriptPath"
 Write-Host "  Command: $command"
 Write-Host ""
-Write-Host "Test it: in a browser address bar, enter  kickoff://PhD"
+Write-Host "Test it: open the dashboard with [B]_localhost homepage.bat and click any Kickoff button."

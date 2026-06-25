@@ -1,10 +1,10 @@
 # ============================================================
 # DirNav kickoff runner
 # Invoked by the kickoff:// protocol, or from the command line.
-#   Full kickoff:    kickoff.ps1 "kickoff://WSe2OEP"
-#   Selected items:  kickoff.ps1 "kickoff://WSe2OEP?items=d0,u0,f1"
-#   Open P00:        kickoff.ps1 "kickoff://WSe2OEP?items=p"
-#   From CLI:        kickoff.ps1 WSe2OEP
+#   Full kickoff:    kickoff.ps1 "kickoff://MySlug"
+#   Selected items:  kickoff.ps1 "kickoff://MySlug?items=d0,u0,f1"
+#   Open P00:        kickoff.ps1 "kickoff://MySlug?items=p"
+#   From CLI:        kickoff.ps1 MySlug
 #
 # Item refs: d = folders, u = urls, f = files, p = p00 (VSCode), pd = p00 folder.
 # Indices are resolved against projects.json here, so the URL never
