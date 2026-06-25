@@ -3,30 +3,30 @@ DirNav
 
 One JSON file, one click, every folder and url and file for a project opens at once. DirNav is a local dashboard that turns a single `projects.json` manifest into a static page, and routes each click through a custom `kickoff://` URI to a PowerShell runner that opens the right things on your machine.
 
-![DirNav dashboard](docs/screenshot.png)
+<!-- ![DirNav dashboard](docs/screenshot.png) -->
 
-![Kickoff opening folders, urls, and files](docs/kickoff.gif)
+![Kickoff opening folders, urls, and files](DirNav_demo.gif)
 
 Windows 10 and 11. MIT licensed.
-
 
 
 # Why this exists
 
 ## The Problem
-1. A user usually manage 10~20 active projects on their computer, ranging from work to personal, learning to hobby, and research to side projects. 
-2. Each project has its own folder(s), url(s), and file(s) that the user needs to open to work on it.
-3. Opening all the related folders, urls, and files for a project takes time and attention, and the user might forget some of them, or open the wrong one.
-4. After a long pause on a certain project, the user might forget where are all the related folders are, and might need lose time to search for them, and even create friction to start working on it again.
+1. 🤯 A user usually manages 10 to 20 active projects on their computer, ranging from work to personal, learning to hobby, and research to side projects.
+2. 🎯 The user knows their projects and can roughly compare priorities between them. Even so, it is hard to keep track of all of them.
+3. 📚 Each project has its own folders, urls, and files that the user needs to open to work on it.
+4. 🔍 Locating and opening all the related folders, urls, and files for a project takes time and attention, and the user might forget some of them, or open the wrong one.
+5. 🫠 After a long pause on a project, the user might forget where the related folders are, lose time searching for them, and feel friction starting work again.
 
+## Solution and Features
+DirNav is a local dashboard that turns a single `projects.json` manifest into a static page, and routes each click through a custom `kickoff://` URI to a PowerShell runner that opens the right things on your machine. It addresses the five problems above as follows:
 
-Every project lives in a different corner of your disk. A code folder on one drive, an Overleaf url, a status spreadsheet on OneDrive, a Claude project, three reference folders, a launcher `.bat`. Opening them all takes ten minutes of clicking. Multiply by twenty active projects and the friction becomes its own task.
-
-DirNav collapses two failed habits into one tool:
-- A `Portal` folder of alphabetical shortcuts. Easy to add to, impossible to scan.
-- A `Kickoff` folder of fourteen near-identical PowerShell scripts, one per project. Each is twenty lines of `Start-Process` plus tab-orchestration boilerplate. Edit one path, edit fourteen files.
-
-Add a project in one place. Open everything for it in one click.
+1. 🏷️ Each project can carry multiple attributes. For example, a personal coding project for stock market analysis can have the attributes `personal`, `coding`, and `finance`. Filter projects by attribute to find the one you want to work on quickly.
+2. 🚩 Each project has a priority from 0 to 10, adjustable at any time. The dashboard sorts projects by priority so the most important one surfaces first.
+3. 📝 `projects.json` records every folder, url, and file of a project, so nothing is forgotten even when things are scattered across different folders or online services.
+4. ⚙️ The Kickoff button opens every folder, url, and file of a project in one click. Check or uncheck individual items to open only a subset.
+5. ➡️ We encourage each project to have a `P00` progress log. Write an overview, then after each work session note what was done and what to do next. This makes it easy to pick up again after a long pause.
 
 
 
@@ -121,7 +121,7 @@ LICENSE
 ```json
 {
   "schemaVersion": 1,
-  "attributePool": ["PhD", "research", "venture", "coding", "productivity", "website", "music", "career", "personal"],
+  "attributePool": ["coding", "career", "venture", "learning", "music", "personal"],
   "statusPool": [ { "value": "active", "label": "Active", "description": "...", "dim": false, "order": 1 } ],
   "projects": [ ]
 }
@@ -173,13 +173,13 @@ Use this order for each project object. Every project should include every field
 {
     "projectSlug": "ProjectAlpha",
     "projectName": "Project Alpha",
-    "attributes": ["research", "coding"],
+    "attributes": ["coding", "learning"],
     "priority": 8,
     "status": "active",
     "p00InitiationDate": "2026-01-15",
     "startDate": "2025-09-01",
     "lastWorkDate": "2026-06-20",
-    "note": "Primary research project; vision pipeline plus model training.",
+    "note": "Primary coding project; notebooks plus a small dataset.",
     "folders": [
         "C:\\Users\\you\\Projects\\ProjectAlpha",
         "C:\\Users\\you\\Projects\\ProjectAlpha\\notebooks",
