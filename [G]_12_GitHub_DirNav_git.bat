@@ -4,7 +4,7 @@ setlocal EnableDelayedExpansion
 REM ==================================================
 REM SETTINGS
 REM ==================================================
-set "WORKDIR=D:\01_Floor\a_Ed\09_EECS\20_Website\07_DirNav"
+set "WORKDIR=D:\01_Floor\a_Ed\21_Claude\05_Project management\07_DirNav"
 set "TARGET_DIR=12_GitHub_DirNav"
 set "REPO_URL=git@github.com:edchen1240/DirNav.git"
 set "BRANCH=main"
