@@ -1,0 +1,106 @@
+/* =================================================================
+   DirNav forest theme
+   Imports the full default stylesheet, then overrides only the color
+   palette in :root. Attribute chip colors stay as defined in style.css.
+   Reference: #87A646 #63732C #535925 #8C613B #402718
+   ================================================================= */
+
+@import url("style.css");
+
+:root {
+  /* color palette */
+  --color01:     #87A646;
+  --color02:  #8C613B;
+  --bg:       #2e1a10;
+  --panel:    #3f4520;
+  --panel2:   #535925;
+  --header-bg: rgb(83 89 37 / 94%);
+  --text:     #ece8d8;
+  --muted:    #b0aa82;
+  --empty-text: #7a7658;
+  --white:    #f5f2e8;
+  --border:   #63732C;
+  --gray-dark:  #352218;
+  --gray-light: #5a6040;
+  --tag-fallback: #8a8668;
+  --ink:        #000000;
+  --finder-row-hover-bg: color-mix(in srgb, var(--color01) 12%, transparent);
+  --shadow-cyan:    color-mix(in srgb, var(--color01) 22%, transparent);
+  --shadow-magenta: color-mix(in srgb, var(--color02) 14%, transparent);
+  --card-hover-shadow: 0 0 16px var(--shadow-cyan), 0 0 22px var(--shadow-magenta);
+  --blockquote-accent-bg: color-mix(in srgb, var(--color02) 8%, transparent);
+  --toast-bg:   #535925;
+  --toast-text: var(--text);
+  /* buttons — stronger multi; Compile stays muted olive-brown, not white */
+  --btn-mf-bkgd:        linear-gradient(135deg,
+                          color-mix(in srgb, var(--color01) 52%, var(--panel2)),
+                          color-mix(in srgb, var(--color02) 44%, var(--panel2)));
+  --btn-mf-font:        var(--white);
+  --btn-sf-bkgd:        linear-gradient(135deg,
+                          color-mix(in srgb, var(--gray-light) 65%, var(--panel2)),
+                          color-mix(in srgb, var(--gray-dark) 80%, var(--bg)));
+  --btn-sf-font:        var(--text);
+  --btn-plain-border:   color-mix(in srgb, var(--muted) 55%, var(--border));
+  --btn-plain-font:     var(--muted);
+  --btn-plain-hover-font:   var(--text);
+  --btn-plain-hover-border: var(--color01);
+  /* header controls — high contrast on olive header */
+  --header-fg:        #ffffff;
+  --header-edge:      var(--header-fg);
+  --chip-off-text:    var(--header-fg);
+  --search-text:      var(--header-fg);
+  --brand-grad-start: #d8eca8;
+  --brand-grad-end:   #ffffff;
+}
+
+/* --- forest header: chips, search, logo --- */
+.dn-header .dn-brand {
+  background-image: linear-gradient(135deg, var(--brand-grad-start), var(--brand-grad-end));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 55%));
+}
+
+.dn-header .dn-search {
+  background: color-mix(in srgb, var(--bg) 72%, var(--panel2));
+  border-color: var(--header-edge);
+  color: var(--search-text);
+}
+
+.dn-header .dn-search::placeholder {
+  color: color-mix(in srgb, var(--search-text) 72%, transparent);
+}
+
+.dn-header .dn-search:focus {
+  border-color: var(--color01);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color01) 35%, transparent);
+}
+
+.dn-header .dn-chip:not(.on) {
+  color: var(--chip-off-text);
+  border-color: var(--header-edge);
+  border-left-color: var(--tag, var(--header-edge));
+  background: rgb(46 26 16 / 38%);
+}
+
+.dn-header .dn-chip:not(.on):hover {
+  color: var(--header-fg);
+  background: rgb(46 26 16 / 52%);
+  border-color: var(--header-fg);
+}
+
+.dn-header .dn-toggle {
+  color: color-mix(in srgb, var(--header-fg) 88%, var(--muted));
+}
+
+.dn-header .dn-chips-row .btn-plain {
+  color: color-mix(in srgb, var(--header-fg) 88%, var(--muted));
+  border-color: color-mix(in srgb, var(--header-fg) 55%, var(--border));
+}
+
+.dn-header .dn-chips-row .btn-plain:hover {
+  color: var(--header-fg);
+  border-color: var(--header-fg);
+}

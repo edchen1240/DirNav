@@ -1,0 +1,124 @@
+/* =================================================================
+   DirNav macaron theme
+   Light pastel palette. Imports style.css and overrides non-attribute
+   colors. Attribute chip colors stay as defined in style.css.
+   Reference: Cookie Crumb #DDA065, Vanilla Frosting #F6D2A8,
+   Pink Icing #FFCBE2, Sprinkle #F6A2BE, Frosted #CBE7EF
+   ================================================================= */
+
+@import url("style.css");
+
+:root {
+  /* color palette */
+  --color01:     #7aacbc;
+  --color02:     #F6A2BE;
+  --bg:          #FFF9F3;
+  --panel:       color-mix(in srgb, #FFCBE2 28%, #ffffff);
+  --panel2:      color-mix(in srgb, #F6D2A8 42%, #ffffff);
+  --header-bg:   rgb(246 210 168 / 96%);
+  --text:        #4a3828;
+  --muted:       #9a7248;
+  --empty-text:  #b8956e;
+  --white:       #ffffff;
+  --border:      color-mix(in srgb, #DDA065 38%, #FFCBE2);
+  --gray-dark:   #c99560;
+  --gray-light:  #FFCBE2;
+  --tag-fallback: #DDA065;
+  --ink:         #4a3828;
+  --attr-chip-off: #8b6f54;
+  --finder-row-hover-bg: color-mix(in srgb, var(--color02) 16%, transparent);
+  --shadow-cyan:    color-mix(in srgb, var(--color01) 28%, transparent);
+  --shadow-magenta: color-mix(in srgb, var(--color02) 22%, transparent);
+  --card-hover-shadow: 0 0 14px var(--shadow-cyan), 0 0 18px var(--shadow-magenta);
+  --blockquote-accent-bg: color-mix(in srgb, var(--color02) 14%, transparent);
+  --toast-bg:   #F6A2BE;
+  --toast-text: var(--text);
+  /* buttons */
+  --btn-mf-bkgd:        linear-gradient(135deg, #CBE7EF, #F6A2BE);
+  --btn-mf-font:        var(--text);
+  --btn-sf-bkgd:        linear-gradient(135deg,
+                          color-mix(in srgb, var(--gray-light) 55%, #ffffff),
+                          color-mix(in srgb, var(--gray-dark) 35%, #F6D2A8));
+  --btn-sf-font:        var(--text);
+  --btn-plain-border:   color-mix(in srgb, var(--muted) 45%, var(--border));
+  --btn-plain-font:     var(--muted);
+  --btn-plain-hover-font:   var(--text);
+  --btn-plain-hover-border: var(--color02);
+  /* header controls — warm dark text on vanilla header */
+  --header-fg:        var(--text);
+  --header-edge:      color-mix(in srgb, var(--muted) 72%, var(--text));
+  --chip-off-text:    var(--header-fg);
+  --search-text:      var(--header-fg);
+  --brand-grad-start: #F6A2BE;
+  --brand-grad-end:   #DDA065;
+}
+
+/* --- macaron header: chips, search, logo --- */
+.dn-header {
+  border-bottom-color: color-mix(in srgb, var(--border) 80%, var(--color02));
+}
+
+.dn-header .dn-brand {
+  background-image: linear-gradient(135deg, var(--brand-grad-start), var(--brand-grad-end));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 1px 1px rgb(255 255 255 / 65%));
+}
+
+.dn-header .dn-search {
+  background: rgb(255 255 255 / 78%);
+  border-color: var(--header-edge);
+  color: var(--search-text);
+}
+
+.dn-header .dn-search::placeholder {
+  color: color-mix(in srgb, var(--search-text) 58%, transparent);
+}
+
+.dn-header .dn-search:focus {
+  border-color: var(--color02);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color02) 35%, transparent);
+}
+
+.dn-header .dn-chip:not(.on) {
+  color: var(--chip-off-text);
+  border-color: var(--header-edge);
+  border-left-color: var(--tag, var(--header-edge));
+  background: rgb(255 255 255 / 52%);
+}
+
+.dn-header .dn-chip:not(.on):hover {
+  color: var(--header-fg);
+  background: rgb(255 255 255 / 72%);
+  border-color: color-mix(in srgb, var(--color02) 55%, var(--header-edge));
+}
+
+.dn-header .dn-toggle {
+  color: var(--muted);
+}
+
+.dn-header .dn-chips-row .btn-plain {
+  color: var(--muted);
+  border-color: var(--btn-plain-border);
+}
+
+.dn-header .dn-chips-row .btn-plain:hover {
+  color: var(--text);
+  border-color: var(--color02);
+}
+
+.dn-header-row .btn-multi-function:hover,
+.dn-actions .btn-multi-function:hover {
+  color: var(--white);
+}
+
+.dn-header-row .btn-single-function:hover {
+  color: var(--white);
+}
+
+/* section headings (PHD, VENTURE, …) — soften the washed-out blue */
+.dn-group-h {
+  color: color-mix(in srgb, var(--color01) 38%, var(--text));
+}

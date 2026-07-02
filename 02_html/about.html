@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About DirNav</title>
+<link rel="icon" type="image/png" href="02_image/DirNav-favicon.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="dn-header">
+  <div class="dn-header-row">
+    <div class="dn-brand"><a href="index.html" style="color:inherit;text-decoration:none;background:inherit;-webkit-text-fill-color:inherit;">DirNav</a></div>
+  </div>
+</header>
+<main class="dn-about-page">
+<h1>DirNav</h1>
+<p>One JSON file, one click, every folder and url and file for a project opens at once. DirNav is a local dashboard that turns a single <code>projects.json</code> manifest into a static page, and routes each click through a custom <code>kickoff://</code> URI to a PowerShell runner that opens the right things on your machine.</p>
+<p><img src="DirNav_demo.gif" alt="Kickoff opening folders, urls, and files"></p>
+<p>Try the <a href="https://edchen1240.github.io/DirNav/" target="_blank" rel="noopener noreferrer">live demo</a>. Browse-only, since Kickoff and Open P00 require the local Windows install.</p>
+<p>Windows 10 and 11. MIT licensed.</p>
+<h1>Why this exists</h1>
+<h2>The Problem</h2>
+<ol>
+<li>🤯 A user usually manages 10 to 20 active projects on their computer, ranging from work to personal, learning to hobby, and research to side projects.</li>
+<li>🎯 The user knows their projects and can roughly compare priorities between them. Even so, it is hard to keep track of all of them.</li>
+<li>📚 Each project has its own folders, urls, and files that the user needs to open to work on it.</li>
+<li>🔍 Locating and opening all the related folders, urls, and files for a project takes time and attention, and the user might forget some of them, or open the wrong one.</li>
+<li>🫠 After a long pause on a project, the user might forget where the related folders are, lose time searching for them, and feel friction starting work again.</li>
+</ol>
+<h2>Solution and Features</h2>
+<p>DirNav is a local dashboard that turns a single <code>projects.json</code> manifest into a static page, and routes each click through a custom <code>kickoff://</code> URI to a PowerShell runner that opens the right things on your machine. It addresses the five problems above as follows:</p>
+<ol>
+<li>🏷️ Each project can carry multiple attributes. For example, a personal coding project for stock market analysis can have the attributes <code>personal</code>, <code>coding</code>, and <code>finance</code>. Filter projects by attribute to find the one you want to work on quickly.</li>
+<li>🚩 Each project has a priority from 0 to 10, adjustable at any time. The dashboard sorts projects by priority so the most important one surfaces first.</li>
+<li>📝 <code>projects.json</code> records every folder, url, and file of a project, so nothing is forgotten even when things are scattered across different folders or online services.</li>
+<li>⚙️ The Kickoff button opens every folder, url, and file of a project in one click. Check or uncheck individual items to open only a subset.</li>
+<li>➡️ We encourage each project to have a <code>P00</code> progress log. Write an overview, then after each work session note what was done and what to do next. This makes it easy to pick up again after a long pause.</li>
+</ol>
+<h1>How it works</h1>
+<pre><code>projects.json  -&gt;  Python generator  -&gt;  static HTML dashboard
+                                                    |
+                                                    | click Kickoff
+                                                    v
+                                       kickoff://open?slug=...&amp;items=...
+                                                    |
+                                       Windows custom URI scheme
+                                                    v
+                                              kickoff.ps1
+                                                    |
+                                                    v
+              folders open as Explorer tabs, urls and files via Start-Process</code></pre>
+<p>The interesting piece is the <code>kickoff://</code> URI scheme. A browser cannot normally launch local programs, for good reason. Registering a custom URI scheme with the OS gives the page exactly one well-defined call site into PowerShell. The dashboard emits <code>kickoff://open?slug=&lt;projectSlug&gt;&amp;items=&lt;index-list&gt;</code>. The runner resolves the slug against <code>projects.json</code>, never executes raw paths from the URL, and only opens entries the manifest already approved.</p>
+<p>The page is the UI. The manifest is the trust boundary. PowerShell does the work.</p>
+<h1>Features</h1>
+<ul>
+<li>Single source of truth: every project, folder, url, file, path to project log file (P00, can be md, txt, or excel), attribute, priority, status, and date lives in <code>projects.json</code>. Edit, recompile, done.</li>
+<li>Fuzzy global finder across every folder, url, file, and P00 path in every project.</li>
+<li>Attribute filter chips with per-tag colors. Add an attribute by editing one line in the manifest.</li>
+<li>Status pool with dim flags. <code>paused</code>, <code>stalled</code>, and <code>completed</code> projects render dimmed automatically.</li>
+<li>Grouped grid. Cards group by primary attribute, the highest-priority group on top, ordered by priority within each group. Low-priority and unset cards drop into a parked band at the bottom.</li>
+<li>One-click batch open. The Kickoff button opens every checked folder as an Explorer tab, then the urls, then the files. Uncheck items to open only a subset.</li>
+<li>Open P00 button. Opens the project's P00 markdown in VSCode. Ctrl plus click opens its folder in Explorer instead.</li>
+<li>Validated at compile time. The generator checks attribute-pool membership, unique slugs, date formats, and related-link symmetry. A broken <code>projects.json</code> prints an error instead of writing a broken page.</li>
+</ul>
+<h1>Quick start</h1>
+<p>Requirements: Windows 10 or 11, Python 3.x on PATH, PowerShell (built in), VSCode (only if you want the Open P00 button). No pip install needed, the generator uses standard library only.</p>
+<p>All internal paths are resolved at install time. The only file you edit by hand is <code>projects.json</code> (the project entries themselves).</p>
+<ol>
+<li>Clone the repo. Copy <code>projects.example.json</code> to <code>projects.json</code> and edit it to point at your own folders.</li>
+<li>Run <code>[B]_0-Install Protocol.bat</code> once. Registers the <code>kickoff://</code> protocol under your Windows user (HKCU). Re-run if you ever move the repo. Fully restart your browser after the first install so it picks up the new scheme.</li>
+<li>Run <code>[B]_P01-Compile Dashboard.bat</code> after every edit to <code>projects.json</code>. Validates the manifest, then regenerates <code>02_html/index.html</code>.</li>
+<li>Run <code>[B]_localhost homepage.bat</code> (or <code>python -m http.server 5599</code> from <code>02_html/</code>) to serve the dashboard, then open <code>http://localhost:5599</code> in your browser. Keep the server running while using DirNav.</li>
+</ol>
+<p>The first Kickoff click prompts you once to allow PowerShell. That is Windows confirming the custom protocol, not the script asking for elevation.</p>
+<h1>Repo layout</h1>
+<pre><code>01_scripts/             P01_generate DirNav page.py, kickoff.ps1, Install-Protocol.ps1
+02_html/                generated index.html, style.css, style-forest.css, style-blue.css, style-macaron.css, 03_js/app.js, 04_includes/
+projects.example.json   sanitized sample manifest
+[B]_0-Install Protocol.bat
+[B]_P01-Compile Dashboard.bat
+[B]_localhost homepage.bat
+README.md
+LICENSE</code></pre>
+<h1>Design notes</h1>
+<ul>
+<li>The manifest is the trust boundary. The browser never sends paths to PowerShell. It sends a slug and an index list. The runner re-resolves both against <code>projects.json</code>. The set of openable things is exactly the set the user has already curated.</li>
+<li>The page is the UI. The runner is the worker. They communicate through one well-defined message: <code>kickoff://open?slug=...&amp;items=...</code>. No other entry point from the browser into the shell.</li>
+<li>Tab orchestration uses SendKeys against Explorer. Not elegant, but as of Windows 11 it is the only reliable way to open multiple folders as tabs in the same window.</li>
+<li>Colors are CSS variables in one place. Edit <code>--attr-&lt;name&gt;</code> in <code>style.css :root</code> to recolor a tag. Add <code>--attr-&lt;name&gt;-font</code> to override the label text color when the background clashes with white (used for the yellow <code>music</code> tag).</li>
+<li>Dashboard theme: in <code>01_scripts/P01_generate DirNav page.py</code>, set <code>PATH_STYLE_CSS</code> to <code>02_html/style.css</code> (default cyan/magenta), <code>02_html/style-forest.css</code>, <code>02_html/style-blue.css</code>, or <code>02_html/style-macaron.css</code>. Recompile with <code>[B]_P01-Compile Dashboard.bat</code>. Alternate themes import <code>style.css</code> and override only the non-attribute color palette; attribute chip colors stay in <code>style.css</code>.</li>
+</ul>
+<p><img src="themes_all.png" alt="DirNav dashboard themes"></p>
+<ul>
+<li>The compiled <code>02_html/index.html</code> is generated. Do not hand-edit it. Edit <code>projects.json</code>, then recompile.</li>
+</ul>
+<h1>Scope and limits</h1>
+<ul>
+<li>Windows only. The browser-to-shell URI bridge, the Explorer tab orchestration, and the path conventions are Windows-specific by design. No plan to port to macOS or Linux.</li>
+<li>Single user. No multi-user state, no sync, no auth. <code>projects.json</code> is your file.</li>
+<li>A productivity tool, not a product. Use it, fork it, or just steal the <code>kickoff://</code> pattern for your own thing.</li>
+</ul>
+<h1>Data format</h1>
+<p><code>projects.json</code> is a JSON object with four top-level keys: <code>schemaVersion</code>, <code>attributePool</code>, <code>statusPool</code>, and <code>projects</code>.</p>
+<pre><code class="lang-json">{
+  "schemaVersion": 1,
+  "attributePool": ["coding", "career", "venture", "learning", "music", "personal"],
+  "statusPool": [ { "value": "active", "label": "Active", "description": "...", "dim": false, "order": 1 } ],
+  "projects": [ ]
+}</code></pre>
+<ul>
+<li><code>schemaVersion</code>: integer. Bump when the field set changes so the generator and validator can migrate older files. Currently <code>1</code>.</li>
+<li><code>attributePool</code>: the controlled, ordered vocabulary of attribute tags. A project's <code>attributes</code> may only contain values from this pool. The order here is the order tags appear (e.g. as filter chips) in the navigator. List them in priority order, not alphabetically. Edit this one line to add, rename, or reorder tags.</li>
+<li><code>statusPool</code>: the controlled, ordered vocabulary of statuses. Each entry has <code>value</code>, <code>label</code>, <code>description</code>, <code>dim</code>, and <code>order</code>. A project's <code>status</code> must equal one of these <code>value</code>s. <code>dim</code> true means the navigator renders that project dimmed (currently <code>paused</code>, <code>stalled</code>, <code>completed</code>).</li>
+<li><code>projects</code>: array of project objects, each using the field order below.</li>
+</ul>
+<h2>Project fields</h2>
+<p>Use this order for each project object. Every project should include every field. Use <code>""</code> for empty strings (<code>note</code>, unset dates), <code>[]</code> for empty arrays (<code>attributes</code>, <code>folders</code>, <code>urls</code>, <code>files</code>, <code>related</code>), and <code>null</code> for an unset <code>priority</code>.</p>
+<ol>
+<li><code>projectSlug</code>: short unique identifier. URL-safe, no spaces. Stable, since renaming breaks the kickoff name, the <code>kickoff://</code> link, and any cross-reference.</li>
+<li><code>projectName</code>: human-readable name shown in the navigator.</li>
+<li><code>attributes</code>: array of tags from <code>attributePool</code>. The first tag is the project's primary attribute and decides which group the card lands in.</li>
+<li><code>priority</code>: integer 0 to 10, or <code>null</code> if unset. Suggested scale: 0 to 2 stalled or parked, 3 to 5 side projects, 6 to 7 main work, 8 to 10 top priority. Used to sort within a filter.</li>
+<li><code>status</code>: one of <code>active</code>, <code>evolving</code>, <code>waiting</code>, <code>paused</code>, <code>stalled</code>, <code>completed</code>. See below.</li>
+<li><code>p00InitiationDate</code>: date this project began being tracked with a P00 file, <code>YYYY-MM-DD</code>.</li>
+<li><code>startDate</code>: date the project itself began, <code>YYYY-MM-DD</code>, or <code>""</code> if unset.</li>
+<li><code>lastWorkDate</code>: most recent known work date, <code>YYYY-MM-DD</code>, or <code>""</code> if unset.</li>
+<li><code>note</code>: short context note for relationships, status, or caveats. <code>""</code> when empty.</li>
+<li><code>folders</code>: array of absolute Windows folder paths. Opened as Explorer tabs by the runner. The first opens in a new window, the rest as tabs, in array order.</li>
+<li><code>urls</code>: array of web urls (Overleaf, Claude projects, websites, order/status pages). A single web url on the dashboard opens directly in a new browser tab. In a batch Kickoff it opens via <code>Start-Process</code>.</li>
+<li><code>files</code>: array of absolute Windows file paths (launchers, spreadsheets, decks, key documents). Each opens in its default app via <code>Start-Process</code>.</li>
+<li><code>related</code>: array of other <code>projectSlug</code> values this project relates to. Keep both directions in sync. A parent lists its children, each child lists the parent.</li>
+<li><code>p00</code>: absolute Windows path to the project's P00 markdown file.</li>
+</ol>
+<h2>Status values</h2>
+<ul>
+<li><code>active</code>: in the current focus, being worked on now. Has an ending goal or milestone.</li>
+<li><code>evolving</code>: a long-lived project with no fixed end, worked on intermittently as it grows. Differs from <code>active</code>, which is a focused push.</li>
+<li><code>waiting</code>: blocked on something external (a person, a decision, a service). Cannot proceed until it resolves.</li>
+<li><code>paused</code>: deliberately set aside; not blocked, resumable any time.</li>
+<li><code>stalled</code>: unintentionally inactive for a long time, usually due to limited time, attention, or money. Drifted rather than decided.</li>
+<li><code>completed</code>: done. No further work expected.</li>
+</ul>
+<h2>Path rules</h2>
+<ul>
+<li>Use absolute Windows paths.</li>
+<li>Escape backslashes as <code>\\</code> because this is JSON.</li>
+<li>Keep urls in <code>urls</code>, local files in <code>files</code>, local directories in <code>folders</code>.</li>
+<li>No duplicate urls or paths within a project.</li>
+</ul>
+<h2>Example project</h2>
+<pre><code class="lang-json">{
+    "projectSlug": "ProjectAlpha",
+    "projectName": "Project Alpha",
+    "attributes": ["coding", "learning"],
+    "priority": 8,
+    "status": "active",
+    "p00InitiationDate": "2026-01-15",
+    "startDate": "2025-09-01",
+    "lastWorkDate": "2026-06-20",
+    "note": "Primary coding project; notebooks plus a small dataset.",
+    "folders": [
+        "C:\\Users\\you\\Projects\\ProjectAlpha",
+        "C:\\Users\\you\\Projects\\ProjectAlpha\\notebooks",
+        "C:\\Users\\you\\Projects\\ProjectAlpha\\data"
+    ],
+    "urls": [
+        "https://www.overleaf.com/project/exampleProjectId"
+    ],
+    "files": [
+        "C:\\Users\\you\\Projects\\ProjectAlpha\\Launch.bat"
+    ],
+    "related": ["ProjectBeta"],
+    "p00": "C:\\Users\\you\\Projects\\ProjectAlpha\\P00_ProjectAlpha.md"
+}</code></pre>
+<h1>Dashboard reference</h1>
+<p>The header has the logo, the global finder, the attribute filter chips, a Hide parked toggle, and a Reset button. Each chip is colored from <code>--attr-&lt;name&gt;</code> in <code>style.css</code>. Click a chip to filter by that attribute. Click Reset to clear chips and search, and re-check every per-item checkbox.</p>
+<p>Below the header, cards group by primary attribute. The highest-priority group lands on top, cards inside each group are ordered by priority descending. Projects with priority below 2 (or unset) drop into a single Low priority / parked band at the bottom regardless of attribute. Dim-flagged statuses render dimmed.</p>
+<p>A card shows:</p>
+<ul>
+<li>Project name in the title row.</li>
+<li>A row of attribute tags, colored per attribute.</li>
+<li>A meta row of <code>projectSlug | priority | status</code>.</li>
+<li>The three dates, with <code>lastWorkDate</code> brighter and bolder than the other two.</li>
+<li>Two buttons: Kickoff (opens the items currently checked; with everything checked, opens folders as Explorer tabs followed by urls and files) and Open P00 (opens the P00 file in VSCode, Ctrl plus click opens the P00 folder in Explorer).</li>
+<li>Three sections (Folders, URLs, Files), each item with a checkbox (all checked by default) and a clickable label. A single folder or file goes through <code>kickoff.ps1</code>. A single web url opens directly in a new browser tab.</li>
+<li>A <code>related</code> line of clickable slugs that jump to the related card.</li>
+</ul>
+<h1>License</h1>
+<p>MIT. See <code>LICENSE</code>.</p>
+</main>
+</body>
+</html>

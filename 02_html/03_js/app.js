@@ -12,7 +12,7 @@
 
   // Attribute colors live in style.css :root as --attr-<name>. This returns a
   // reference to that var, so colors are defined in one place (the CSS).
-  function colorFor(a) { return "var(--attr-" + a + ", #888888)"; }
+  function colorFor(a) { return "var(--attr-" + a + ", var(--tag-fallback))"; }
 
   var app = document.getElementById("app");
   var chipsEl = document.getElementById("dn-chips");
@@ -46,6 +46,19 @@
     return "kickoff://" + encodeURIComponent(slug) + (items && items.length ? "?items=" + items.join(",") : "");
   }
   function go(url) { window.location.href = url; }
+  function p00ButtonLabel(p) {
+    var kb = p.p00SizekB;
+    if (kb === null || kb === undefined) return "P00 (-)";
+    return "P00 (" + kb + ")";
+  }
+  function showToast(msg) {
+    var el = document.createElement("div");
+    el.className = "dn-toast";
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(function () { el.style.opacity = "0"; }, 1400);
+    setTimeout(function () { el.remove(); }, 1850);
+  }
 
   // ---------- card ----------
   function itemsHtml(slug, arr, kind, labelFn) {
@@ -87,8 +100,8 @@
         ' | <span class="dn-status">' + esc(sm.label) + "</span></div>" +
       '<div class="dn-dates">' + dates + "</div>" +
       '<div class="dn-actions">' +
-        '<button data-act="kickoff" data-slug="' + esc(p.projectSlug) + '">Kickoff</button>' +
-        '<button data-act="p00" data-slug="' + esc(p.projectSlug) + '" title="Click: open P00 in VSCode. Ctrl+click: open the P00 folder.">Open P00</button>' +
+        '<button class="btn-multi-function" data-act="kickoff" data-slug="' + esc(p.projectSlug) + '">Kickoff</button>' +
+        '<button class="btn-multi-function" data-act="p00" data-slug="' + esc(p.projectSlug) + '" title="Click: open P00 in VSCode. Shift+click: open P00 folder. Ctrl+click: copy P00 path.">' + esc(p00ButtonLabel(p)) + "</button>" +
       "</div>" +
       section("Folders", itemsHtml(p.projectSlug, p.folders, "d", baseName)) +
       section("URLs", itemsHtml(p.projectSlug, p.urls, "u", urlLabel)) +
@@ -168,6 +181,54 @@
     render(); // rebuilds the cards, so every checkbox returns to checked
   });
 
+  // ---------- Latest Weekly button ----------
+  var weeklyBtn = document.getElementById("dn-open-weekly");
+  if (weeklyBtn) {
+    weeklyBtn.addEventListener("click", function (e) {
+      if (e.ctrlKey) {
+        var wp = window.DIRNAV_LATEST_WEEKLY_PATH || "";
+        if (wp) navigator.clipboard.writeText(wp).then(function () { showToast("Copied: " + wp); });
+        else showToast("Latest weekly path not available");
+      } else {
+        go("kickoff://__weekly?items=" + (e.shiftKey ? "pd" : "p"));
+      }
+    });
+  }
+
+  // ---------- projects.json manifest button ----------
+  // Mirrors the Open P00 three-mode interaction, but targets the manifest file
+  // itself rather than any single project's P00.
+  var manifestBtn = document.getElementById("dn-open-manifest");
+  if (manifestBtn) {
+    manifestBtn.addEventListener("click", function (e) {
+      if (e.ctrlKey) {
+        var mp = window.DIRNAV_MANIFEST_PATH || "";
+        if (mp) navigator.clipboard.writeText(mp).then(function () { showToast("Copied: " + mp); });
+      } else {
+        go("kickoff://__manifest?items=" + (e.shiftKey ? "pd" : "p"));
+      }
+    });
+  }
+
+  // ---------- Compile button ----------
+  // Runs [B]_P01-Compile Dashboard.bat via kickoff:// to regenerate index.html.
+  var compileBtn = document.getElementById("dn-compile");
+  if (compileBtn) {
+    compileBtn.addEventListener("click", function () {
+      go("kickoff://__compile");
+    });
+  }
+
+  // ---------- About button ----------
+  // Opens the pre-compiled about.html (generated from README.md by the Python
+  // generator) in a new tab. Works under both file:// and http://.
+  var aboutBtn = document.getElementById("dn-about");
+  if (aboutBtn) {
+    aboutBtn.addEventListener("click", function () {
+      window.open("about.html", "_blank", "noopener");
+    });
+  }
+
   // ---------- finder ----------
   var STOP = new Set(["of", "the", "a", "an", "in", "on", "to", "for", "and", "or"]);
   function tokens(q) { return q.toLowerCase().split(/\s+/).filter(function (t) { return t && !STOP.has(t); }); }
@@ -230,8 +291,27 @@
       if (checked.length === allBoxes.length) go(kickoffUrl(slug)); // all checked: full kickoff (folders open as tabs)
       else go(kickoffUrl(slug, checked));                           // subset: open just the checked items
     }
-    else if (act === "p00") go(kickoffUrl(slug, [e.ctrlKey ? "pd" : "p"]));
-    else if (act === "item") { e.preventDefault(); go(kickoffUrl(slug, [t.dataset.ref])); }
+    else if (act === "p00") {
+      if (e.ctrlKey) {
+        var proj = projects.find(function (p) { return p.projectSlug === slug; });
+        if (proj && proj.p00) navigator.clipboard.writeText(proj.p00).then(function () { showToast("Copied: " + proj.p00); });
+      } else {
+        go(kickoffUrl(slug, [e.shiftKey ? "pd" : "p"]));
+      }
+    }
+    else if (act === "item") {
+      e.preventDefault();
+      if (e.ctrlKey && t.dataset.ref.charAt(0) === "d") {
+        var fp = projects.find(function (pp) { return pp.projectSlug === slug; });
+        if (fp) {
+          var fidx = parseInt(t.dataset.ref.slice(1), 10);
+          var fpath = fp.folders[fidx];
+          if (fpath) navigator.clipboard.writeText(fpath).then(function () { showToast("Copied: " + fpath); });
+        }
+        return;
+      }
+      go(kickoffUrl(slug, [t.dataset.ref]));
+    }
     else if (act === "related") { e.preventDefault(); jumpTo(slug); }
   });
 

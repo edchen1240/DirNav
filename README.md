@@ -75,8 +75,8 @@ Requirements: Windows 10 or 11, Python 3.x on PATH, PowerShell (built in), VSCod
 All internal paths are resolved at install time. The only file you edit by hand is `projects.json` (the project entries themselves).
 
 1. Clone the repo. Copy `projects.example.json` to `projects.json` and edit it to point at your own folders.
-2. Run `[B]_1-Install Protocol.bat` once. Registers the `kickoff://` protocol under your Windows user (HKCU). Re-run if you ever move the repo. Fully restart your browser after the first install so it picks up the new scheme.
-3. Run `[B]_2-Compile Dashboard.bat` after every edit to `projects.json`. Validates the manifest, then regenerates `02_html/index.html`.
+2. Run `[B]_0-Install Protocol.bat` once. Registers the `kickoff://` protocol under your Windows user (HKCU). Re-run if you ever move the repo. Fully restart your browser after the first install so it picks up the new scheme.
+3. Run `[B]_P01-Compile Dashboard.bat` after every edit to `projects.json`. Validates the manifest, then regenerates `02_html/index.html`.
 4. Run `[B]_localhost homepage.bat` (or `python -m http.server 5599` from `02_html/`) to serve the dashboard, then open `http://localhost:5599` in your browser. Keep the server running while using DirNav.
 
 The first Kickoff click prompts you once to allow PowerShell. That is Windows confirming the custom protocol, not the script asking for elevation.
@@ -87,10 +87,10 @@ The first Kickoff click prompts you once to allow PowerShell. That is Windows co
 
 ```
 01_scripts/             P01_generate DirNav page.py, kickoff.ps1, Install-Protocol.ps1
-02_html/                generated index.html, style.css, 03_js/app.js, 04_includes/
+02_html/                generated index.html, style.css, style-forest.css, style-blue.css, style-macaron.css, 03_js/app.js, 04_includes/
 projects.example.json   sanitized sample manifest
-[B]_1-Install Protocol.bat
-[B]_2-Compile Dashboard.bat
+[B]_0-Install Protocol.bat
+[B]_P01-Compile Dashboard.bat
 [B]_localhost homepage.bat
 README.md
 LICENSE
@@ -104,6 +104,9 @@ LICENSE
 - The page is the UI. The runner is the worker. They communicate through one well-defined message: `kickoff://open?slug=...&items=...`. No other entry point from the browser into the shell.
 - Tab orchestration uses SendKeys against Explorer. Not elegant, but as of Windows 11 it is the only reliable way to open multiple folders as tabs in the same window.
 - Colors are CSS variables in one place. Edit `--attr-<name>` in `style.css :root` to recolor a tag. Add `--attr-<name>-font` to override the label text color when the background clashes with white (used for the yellow `music` tag).
+- Dashboard theme: in `01_scripts/P01_generate DirNav page.py`, set `PATH_STYLE_CSS` to `02_html/style.css` (default cyan/magenta), `02_html/style-forest.css`, `02_html/style-blue.css`, or `02_html/style-macaron.css`. Recompile with `[B]_P01-Compile Dashboard.bat`. Alternate themes import `style.css` and override only the non-attribute color palette; attribute chip colors stay in `style.css`.
+
+![DirNav dashboard themes](themes_all.png)
 - The compiled `02_html/index.html` is generated. Do not hand-edit it. Edit `projects.json`, then recompile.
 
 

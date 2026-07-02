@@ -1,10 +1,10 @@
 # ============================================================
 # DirNav kickoff runner
 # Invoked by the kickoff:// protocol, or from the command line.
-#   Full kickoff:    kickoff.ps1 "kickoff://MySlug"
-#   Selected items:  kickoff.ps1 "kickoff://MySlug?items=d0,u0,f1"
-#   Open P00:        kickoff.ps1 "kickoff://MySlug?items=p"
-#   From CLI:        kickoff.ps1 MySlug
+#   Full kickoff:    kickoff.ps1 "kickoff://WSe2OEP"
+#   Selected items:  kickoff.ps1 "kickoff://WSe2OEP?items=d0,u0,f1"
+#   Open P00:        kickoff.ps1 "kickoff://WSe2OEP?items=p"
+#   From CLI:        kickoff.ps1 WSe2OEP
 #
 # Item refs: d = folders, u = urls, f = files, p = p00 (VSCode), pd = p00 folder.
 # Indices are resolved against projects.json here, so the URL never
@@ -55,6 +55,55 @@ if ($raw.Contains("?")) {
 }
 $slug = $slug.TrimEnd('/')   # Chrome appends a slash to the authority, e.g. SARD/?items=p
 try { $slug = [System.Uri]::UnescapeDataString($slug) } catch {}
+
+# Synthetic slug: the manifest file itself.
+# kickoff://__manifest?items=p  -> open projects.json in VSCode
+# kickoff://__manifest?items=pd -> open its parent folder in Explorer
+if ($slug -eq "__manifest") {
+    if ($itemSpec -eq "pd") {
+        Start-Process -FilePath "cmd.exe" -ArgumentList "/c", "explorer", "`"$(Split-Path $JsonPath -Parent)`"" -WindowStyle Hidden
+    } else {
+        Start-Process -FilePath "cmd.exe" -ArgumentList "/c", "code", "`"$JsonPath`"" -WindowStyle Hidden
+    }
+    exit 0
+}
+
+# Synthetic slug: latest weekly log (resolved at click time via weekly retriever).
+# kickoff://__weekly?items=p  -> open latest weekly .md in VSCode
+# kickoff://__weekly?items=pd -> open its parent folder in Explorer
+if ($slug -eq "__weekly") {
+    $weeklyPy = "D:\01_Floor\a_Ed\21_Claude\02_AI Career Advise\01_Weekly\P01_latest weekly retriever.py"
+    if (-not (Test-Path -LiteralPath $weeklyPy)) {
+        Exit-WithError "Weekly retriever not found at $weeklyPy"
+    }
+    $jsonText = & python $weeklyPy --json 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) {
+        Exit-WithError "Weekly retriever failed:`n$jsonText"
+    }
+    $summary = $jsonText | ConvertFrom-Json
+    $weeklyPath = $summary.path
+    if ([string]::IsNullOrWhiteSpace($weeklyPath) -or -not (Test-Path -LiteralPath $weeklyPath)) {
+        Exit-WithError "Latest weekly file not found at $weeklyPath"
+    }
+    if ($itemSpec -eq "pd") {
+        Start-Process -FilePath "cmd.exe" -ArgumentList "/c", "explorer", "`"$(Split-Path $weeklyPath -Parent)`"" -WindowStyle Hidden
+    } else {
+        Start-Process -FilePath "cmd.exe" -ArgumentList "/c", "code", "`"$weeklyPath`"" -WindowStyle Hidden
+    }
+    exit 0
+}
+
+# Synthetic slug: run the Compile bat from the project root.
+# kickoff://__compile -> [B]_P01-Compile Dashboard.bat
+if ($slug -eq "__compile") {
+    $batPath = Join-Path (Split-Path $JsonPath -Parent) "[B]_P01-Compile Dashboard.bat"
+    if (Test-Path -LiteralPath $batPath) {
+        Start-Process -FilePath $batPath
+    } else {
+        Exit-WithError "Compile bat not found at $batPath"
+    }
+    exit 0
+}
 
 $data = Get-Content -Raw -LiteralPath $JsonPath | ConvertFrom-Json
 $project = $data.projects | Where-Object { $_.projectSlug -eq $slug } | Select-Object -First 1
